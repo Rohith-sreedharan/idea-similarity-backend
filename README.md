@@ -1,90 +1,105 @@
-# FastAPI Backend Project
+# Idea Similarity Backend (FastAPI)
 
-A FastAPI backend application with machine learning capabilities using sentence-transformers and scikit-learn.
+FastAPI backend powering authentication, idea similarity scanning, settings, and persistent profile icon updates.
+
+## Features
+
+- Semantic idea similarity using `sentence-transformers`
+- Source breakdown generation for analysis cards
+- Auth APIs: login and signup
+- Settings APIs for summary, account, subscription, notifications, help
+- Unsplash profile icon catalog and profile image update API
+- File-based persistence (`user_store.json`) for permanent user/settings data
+
+## Tech Stack
+
+- Python
+- FastAPI
+- Uvicorn
+- sentence-transformers
+- scikit-learn
+- NumPy
 
 ## Setup
 
-### 1. Activate Virtual Environment
-
 ```bash
-# Windows
-.\venv\Scripts\activate
-
-# Linux/Mac
+python3 -m venv venv
 source venv/bin/activate
-```
-
-### 2. Install Dependencies
-
-Dependencies are already installed, but if you need to reinstall:
-
-```bash
 pip install -r requirements.txt
 ```
 
-## Running the Application
+## Run
 
-### Development Mode (with auto-reload)
+Development:
 
 ```bash
 python app.py
 ```
 
-Or using uvicorn directly:
+Or:
 
 ```bash
-uvicorn app:app --reload --host 0.0.0.0 --port 8000
+uvicorn app:app --reload --host 0.0.0.0 --port 8005
 ```
 
-### Production Mode
+The current backend runs on port `8005`.
 
-```bash
-uvicorn app:app --host 0.0.0.0 --port 8000
-```
+## API Docs
+
+- Swagger: http://localhost:8005/docs
+- ReDoc: http://localhost:8005/redoc
 
 ## API Endpoints
 
-### Health Check
-- **GET** `/` - Root endpoint
-- **GET** `/health` - Health check endpoint
+### Health
 
-### Processing
-- **POST** `/api/process` - Process text input
-  ```json
-  {
-    "text": "Your text here"
-  }
-  ```
+- `GET /`
+- `GET /health`
 
-## API Documentation
+### Similarity
 
-Once the server is running, visit:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- `POST /check`
+
+Request:
+
+```json
+{
+  "text": "Your manuscript title or content"
+}
+```
+
+### Auth
+
+- `POST /auth/login`
+- `POST /auth/signup`
+
+### Settings
+
+- `GET /settings/summary/{user_id}`
+- `GET /settings/account/{user_id}`
+- `GET /settings/subscription/{user_id}`
+- `GET /settings/notifications/{user_id}`
+- `GET /settings/help/{user_id}`
+- `GET /settings/profile-icons`
+- `PUT /settings/account/profile-image/{user_id}`
+
+## Persistence
+
+User and settings data are persisted in:
+
+- `user_store.json`
+
+Updates that are persisted permanently:
+
+- Signup-created users
+- Profile icon updates
 
 ## Project Structure
 
 ```
-Pdd/
-├── venv/                  # Virtual environment
-├── app.py                 # Main FastAPI application
-├── requirements.txt       # Project dependencies
-├── .gitignore            # Git ignore file
-└── README.md             # This file
+idea-similarity-backend/
+├── app.py
+├── requirements.txt
+├── user_store.json
+└── README.md
 ```
-
-## Installed Packages
-
-- **fastapi** - Modern web framework for building APIs
-- **uvicorn** - ASGI server for running FastAPI
-- **sentence-transformers** - State-of-the-art sentence embeddings
-- **scikit-learn** - Machine learning library
-- **pydantic** - Data validation using Python type annotations
-
-## Next Steps
-
-1. Implement your ML logic in the `/api/process` endpoint
-2. Add additional endpoints as needed
-3. Configure CORS settings for production
-4. Add authentication if required
-5. Set up database connections if needed

@@ -1,0 +1,52 @@
+{
+  "users": {
+    "elena.sterling@university.edu": {
+      "password": "demo123",
+      "token": "token_elena_abc123",
+      "user_id": "u_1001",
+      "name": "Dr. Elena Sterling",
+      "email": "elena.sterling@university.edu"
+    }
+  },
+  "settings": {
+    "u_1001": {
+      "summary": {
+        "subscription_plan": "Premium Plan Active",
+        "notification_status": "Email + Push Enabled",
+        "support_status": "Priority Academic Support"
+      },
+      "account": {
+        "full_name": "Dr. Elena Sterling",
+        "email": "elena.sterling@university.edu",
+        "department": "Computational Linguistics",
+        "institution": "University Academic Research Center",
+        "profile_image_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80"
+      },
+      "subscription": {
+        "plan_name": "ScholarMetric Premium",
+        "renewal_date": "2026-09-15",
+        "billing_cycle": "Annual",
+        "features": [
+          "Unlimited manuscript scans",
+          "Advanced source breakdown",
+          "Exportable PDF compliance reports",
+          "Priority review queue"
+        ]
+      },
+      "notifications": {
+        "email_notifications": true,
+        "push_notifications": true,
+        "weekly_digest": false
+      },
+      "help": {
+        "support_email": "support@scholarmetric.ai",
+        "help_center_url": "https://scholarmetric.ai/help",
+        "faq_topics": [
+          "Improving originality score",
+          "Understanding confidence levels",
+          "Fixing citation formatting"
+        ]
+      }
+    }
+  }
+}
