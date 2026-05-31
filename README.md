@@ -4,7 +4,7 @@ FastAPI backend powering authentication, idea similarity scanning, settings, and
 
 ## Features
 
-- Semantic idea similarity using `sentence-transformers`
+- Lightweight token-based idea similarity scoring
 - Source breakdown generation for analysis cards
 - Auth APIs: login and signup
 - Settings APIs for summary, account, subscription, notifications, help
@@ -16,9 +16,7 @@ FastAPI backend powering authentication, idea similarity scanning, settings, and
 - Python
 - FastAPI
 - Uvicorn
-- sentence-transformers
-- scikit-learn
-- NumPy
+- Standard library token vectorization
 
 ## Setup
 
