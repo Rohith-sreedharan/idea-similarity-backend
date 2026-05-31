@@ -1,6 +1,3 @@
 fastapi
 uvicorn[standard]
-sentence-transformers
-scikit-learn
 pydantic
-python-multipart

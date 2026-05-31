@@ -1,15 +1,15 @@
 from copy import deepcopy
+from collections import Counter
 import json
+import math
 from pathlib import Path
+import re
 from typing import List
 
-import numpy as np
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -27,8 +27,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load SentenceTransformer model once at startup
-model = SentenceTransformer("all-MiniLM-L6-v2")
+TOKEN_PATTERN = re.compile(r"[a-z0-9']+")
+
+
+def text_to_vector(text: str) -> Counter:
+    return Counter(TOKEN_PATTERN.findall(text.lower()))
+
+
+def cosine_similarity_score(vector_a: Counter, vector_b: Counter) -> float:
+    if not vector_a or not vector_b:
+        return 0.0
+
+    dot_product = sum(value * vector_b.get(token, 0) for token, value in vector_a.items())
+    norm_a = math.sqrt(sum(value * value for value in vector_a.values()))
+    norm_b = math.sqrt(sum(value * value for value in vector_b.values()))
+
+    if norm_a == 0.0 or norm_b == 0.0:
+        return 0.0
+
+    return dot_product / (norm_a * norm_b)
 
 # Sample project ideas
 project_ideas = [
@@ -36,7 +53,7 @@ project_ideas = [
     "Create a web application for real-time chat using WebSockets and React",
     "Develop an AI-powered recommendation system for e-commerce products",
 ]
-project_embeddings = model.encode(project_ideas)
+project_vectors = [text_to_vector(idea) for idea in project_ideas]
 
 # Source corpus used for source-breakdown cards
 source_documents = [
@@ -67,7 +84,7 @@ source_documents = [
     },
 ]
 source_corpus = [f"{doc['title']} {doc['description']}" for doc in source_documents]
-source_embeddings = model.encode(source_corpus)
+source_vectors = [text_to_vector(source) for source in source_corpus]
 
 
 class HealthResponse(BaseModel):
@@ -347,21 +364,25 @@ async def health_check():
 
 @app.post("/check", response_model=CheckResponse)
 async def check_similarity(input_data: CheckInput):
-    input_embedding = model.encode([input_data.text])
+    input_vector = text_to_vector(input_data.text)
 
     # Similarity to project ideas (used for high/low status and headline score)
-    idea_similarities = cosine_similarity(input_embedding, project_embeddings)[0]
-    max_similarity_idx = int(np.argmax(idea_similarities))
+    idea_similarities = [cosine_similarity_score(input_vector, vector) for vector in project_vectors]
+    max_similarity_idx = max(range(len(idea_similarities)), key=idea_similarities.__getitem__)
     max_similarity_score = float(idea_similarities[max_similarity_idx])
     most_similar_idea = project_ideas[max_similarity_idx]
 
     # Similarity to source corpus (used for source-breakdown cards)
-    source_scores = cosine_similarity(input_embedding, source_embeddings)[0]
-    top_indices = np.argsort(source_scores)[::-1][:3]
+    source_scores = [cosine_similarity_score(input_vector, vector) for vector in source_vectors]
+    top_indices = sorted(
+        range(len(source_scores)),
+        key=source_scores.__getitem__,
+        reverse=True,
+    )[:3]
 
     source_breakdown: List[SourceBreakdownItem] = []
     for idx in top_indices:
-        pct = int(np.clip(round(float(source_scores[idx]) * 100), 4, 95))
+        pct = int(min(max(round(float(source_scores[idx]) * 100), 4), 95))
         doc = source_documents[int(idx)]
         source_breakdown.append(
             SourceBreakdownItem(
